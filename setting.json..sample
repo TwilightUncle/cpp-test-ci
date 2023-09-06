@@ -1,0 +1,18 @@
+{
+    "projects": [
+        {
+            "name": "test",
+            "target_dir_path": "./src",
+            "compilers": [
+                {
+                    "name": "gcc",
+                    "version_list": ["10", "11", "12"]
+                },
+                {
+                    "name": "clang",
+                    "version_list": ["12", "13", "14"]
+                }
+            ]
+        }
+    ]
+}

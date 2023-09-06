@@ -8,7 +8,7 @@ Windows11
 
 # 依存ソフトのインストール/準備
 
--   GO言語(1.20以降)
+-   GO言語(1.21以降)
 -   dagger
     ※powershellで`Invoke-WebRequest -UseBasicParsing -Uri https://dl.dagger.io/dagger/install.ps1 | Invoke-Expression`を実行
 -   docker
