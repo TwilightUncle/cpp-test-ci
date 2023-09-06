@@ -3,6 +3,6 @@
 static_assert(true);
 int main()
 {
-    std::cout << "abcdefg" << std::endl;
+    std::cout << "test2" << std::endl;
     return 0;
 }

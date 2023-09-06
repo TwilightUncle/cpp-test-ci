@@ -1,16 +1,30 @@
 {
     "projects": [
         {
-            "name": "test",
-            "target_dir_path": "./src",
+            "name": "sample_proj1",
+            "target_dir_path": "./samples/proj1",
             "compilers": [
                 {
                     "name": "gcc",
-                    "version_list": ["10", "11", "12"]
+                    "version_list": ["10", "11"]
                 },
                 {
                     "name": "clang",
-                    "version_list": ["12", "13", "14"]
+                    "version_list": ["12"]
+                }
+            ]
+        },
+        {
+            "name": "sample_proj2",
+            "target_dir_path": "./samples/proj2",
+            "compilers": [
+                {
+                    "name": "gcc",
+                    "version_list": ["11", "12"]
+                },
+                {
+                    "name": "clang",
+                    "version_list": ["13", "14"]
                 }
             ]
         }
