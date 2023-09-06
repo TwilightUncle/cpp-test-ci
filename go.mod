@@ -2,7 +2,7 @@ module local-test-for-cpp
 
 go 1.21.0
 
-require dagger.io/dagger v0.8.4
+require dagger.io/dagger v0.8.3
 
 require (
 	github.com/99designs/gqlgen v0.17.31 // indirect
