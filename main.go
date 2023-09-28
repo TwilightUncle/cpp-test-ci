@@ -70,13 +70,12 @@ func build(ctx context.Context) error {
 
 				// run test
 				logger.Info("== run test =============")
-				executed, err := built.WithExec([]string{"/src/build/testcpp"}).Sync(ctx)
+				_, msg3, err := runTest(ctx, built, env_info)
 				if err != nil {
 					logger.Error("Error occured. :" + err.Error())
 					return err
 				}
-				out, _ := executed.Stdout(ctx)
-				logger.Info(out)
+				logger.Info(msg3)
 
 				return nil
 			},
@@ -122,4 +121,21 @@ func buildBySource(ctx context.Context, container *dagger.Container, env_info ma
 
 	out, err := built.Stdout(ctx)
 	return built, out, err
+}
+
+func runTest(ctx context.Context, container *dagger.Container, env_info map[string]string) (*dagger.Container, string, error) {
+	executed, err := container.
+		WithExec([]string{
+			"ctest",
+			"-C", "Release",
+			"--test-dir", env_info["src_dirname"] + "/build",
+			"--output-on-failure",
+		}).Sync(ctx)
+
+	if err != nil {
+		return executed, "", err
+	}
+
+	out, err := executed.Stdout(ctx)
+	return executed, out, err
 }

@@ -13,12 +13,12 @@ import (
 )
 
 const (
-	template_name     = "Dockerfile.template"
-	template_path     = "./buildenv/templates/" + template_name
-	output_root       = "./docker"
-	output_filename   = "Dockerfile"
-	guest_src_dirname = "/src"
-	guest_vcpkg_dir   = "/opt/vcpkg"
+	ubuntu_template_name = "Dockerfile.template"
+	template_path        = "./buildenv/templates/" + ubuntu_template_name
+	output_root          = "./docker"
+	output_filename      = "Dockerfile"
+	guest_src_dirname    = "/src"
+	guest_vcpkg_dir      = "/opt/vcpkg"
 )
 
 func BuildDocker(ctx context.Context, client *dagger.Client, compiler string, version string, host_src_dirname string) (*dagger.Container, error) {
@@ -29,6 +29,9 @@ func BuildDocker(ctx context.Context, client *dagger.Client, compiler string, ve
 		Directory("./"+getOutputDirPath(compiler, version)).
 		DockerBuild().
 		WithDirectory(guest_src_dirname, client.Host().Directory(host_src_dirname)).
+		WithExec([]string{
+			"rm", "-rf", guest_src_dirname + "/build",
+		}).
 		Sync(ctx)
 }
 
@@ -58,7 +61,7 @@ func createDockerfile(compiler string, version string) error {
 	defer fp.Close()
 
 	// テンプレートの取得と結果ファイル生成
-	tpl, err := template.New(template_name).ParseFiles(template_path)
+	tpl, err := template.New(ubuntu_template_name).ParseFiles(template_path)
 	if err != nil {
 		return err
 	}
