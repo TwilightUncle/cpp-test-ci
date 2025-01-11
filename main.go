@@ -19,39 +19,46 @@ func main() {
 		fmt.Println("Failed to read 'setting.json'")
 		fmt.Println(err)
 	}
-	if err := buildAll(context.Background()); err != nil {
+	for _, err := range buildAll(context.Background()) {
 		fmt.Println(err)
 	}
 }
 
-func buildAll(ctx context.Context) error {
+func buildAll(ctx context.Context) []error {
 	fmt.Println("run test.")
 
 	// initialize Dagger client
 	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
 	if err != nil {
-		return err
+		return []error{err}
 	}
 	defer client.Close()
 
+	// 各環境毎のテスト実行までは平行
+	result := make(chan error)
 	for _, env := range setting.Envs {
-		compiler := env.CompilerName
-		version := env.CompilerVersion
+		go func(e setting.Env) {
+			compiler := e.CompilerName
+			version := e.CompilerVersion
 
-		// 処理系毎に出力するログも分ける
-		err := logging.WithOutputLog(
-			env.ProjectName+"-"+compiler+"-"+version+".log",
-			func(logger *slog.Logger) error {
-				return build(env, ctx, client, logger)
-			},
-		)
-
-		if err != nil {
-			return err
-		}
+			// 処理系毎に出力するログも分け、結果はチャネルに格納
+			result <- logging.WithOutputLog(
+				e.ProjectName+"-"+compiler+"-"+version+".log",
+				func(logger *slog.Logger) error {
+					return build(e, ctx, client, logger)
+				},
+			)
+		}(env)
 	}
 
-	return nil
+	// 各ルーチンの結果収集
+	errors := []error{}
+	for range setting.Envs {
+		if err := <-result; err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return errors
 }
 
 // 各処理系毎のbuild
