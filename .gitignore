@@ -2,3 +2,4 @@ docker/*
 log/*
 
 setting.json
+*.setting.json

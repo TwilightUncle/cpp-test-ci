@@ -14,6 +14,11 @@ import (
 )
 
 func main() {
+	// read setting
+	if err := setting.Setup(); err != nil {
+		fmt.Println("Failed to read 'setting.json'")
+		fmt.Println(err)
+	}
 	if err := build(context.Background()); err != nil {
 		fmt.Println(err)
 	}
@@ -22,12 +27,6 @@ func main() {
 func build(ctx context.Context) error {
 	fmt.Println("run test.")
 
-	// read setting
-	envs, err := setting.ParseJson()
-	if err != nil {
-		return err
-	}
-
 	// initialize Dagger client
 	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
 	if err != nil {
@@ -35,7 +34,7 @@ func build(ctx context.Context) error {
 	}
 	defer client.Close()
 
-	for _, env := range envs {
+	for _, env := range setting.Envs {
 		compiler := env.CompilerName
 		version := env.CompilerVersion
 

@@ -27,7 +27,15 @@ type compiler struct {
 	VersionList []string `json:"version_list"`
 }
 
-func ParseJson() ([]Env, error) {
+var Envs []Env
+
+func Setup() error {
+	envs, err := parseJson()
+	Envs = envs
+	return err
+}
+
+func parseJson() ([]Env, error) {
 	raw_json, err := os.ReadFile("./setting.json")
 	if err != nil {
 		return []Env{}, err
