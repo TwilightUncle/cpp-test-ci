@@ -19,12 +19,12 @@ func main() {
 		fmt.Println("Failed to read 'setting.json'")
 		fmt.Println(err)
 	}
-	if err := build(context.Background()); err != nil {
+	if err := buildAll(context.Background()); err != nil {
 		fmt.Println(err)
 	}
 }
 
-func build(ctx context.Context) error {
+func buildAll(ctx context.Context) error {
 	fmt.Println("run test.")
 
 	// initialize Dagger client
@@ -38,45 +38,11 @@ func build(ctx context.Context) error {
 		compiler := env.CompilerName
 		version := env.CompilerVersion
 
+		// 処理系毎に出力するログも分ける
 		err := logging.WithOutputLog(
 			env.ProjectName+"-"+compiler+"-"+version+".log",
 			func(logger *slog.Logger) error {
-				logger.Info(fmt.Sprintf("## start. target_project: %s, compiler: %s, compiler_version: %s", env.ProjectName, compiler, version))
-				logger.Info("== building dockerfile ================")
-				source, err := buildenv.BuildDocker(ctx, client, compiler, version, env.TargetDirPath)
-				if err != nil {
-					logger.Error("Error occured. :" + err.Error())
-					return err
-				}
-
-				env_info := buildenv.GetCompilerInfo(compiler, version)
-
-				logger.Info("== configure project ================")
-				configured, msg, err := configureCmake(ctx, source, env_info)
-				if err != nil {
-					logger.Error("Error occured. :" + err.Error())
-					return err
-				}
-				logger.Info(msg)
-
-				logger.Info("== build project ================")
-				built, msg2, err := buildBySource(ctx, configured, env_info)
-				if err != nil {
-					logger.Error("Error occured. :" + err.Error())
-					return err
-				}
-				logger.Info(msg2)
-
-				// run test
-				logger.Info("== run test =============")
-				_, msg3, err := runTest(ctx, built, env_info)
-				if err != nil {
-					logger.Error("Error occured. :" + err.Error())
-					return err
-				}
-				logger.Info(msg3)
-
-				return nil
+				return build(env, ctx, client, logger)
 			},
 		)
 
@@ -84,6 +50,49 @@ func build(ctx context.Context) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+// 各処理系毎のbuild
+func build(env setting.Env, ctx context.Context, client *dagger.Client, logger *slog.Logger) error {
+	compiler := env.CompilerName
+	version := env.CompilerVersion
+
+	logger.Info(fmt.Sprintf("## start. target_project: %s, compiler: %s, compiler_version: %s", env.ProjectName, compiler, version))
+	logger.Info("== building dockerfile ================")
+	source, err := buildenv.BuildDocker(ctx, client, compiler, version, env.TargetDirPath)
+	if err != nil {
+		logger.Error("Error occured. :" + err.Error())
+		return err
+	}
+
+	env_info := buildenv.GetCompilerInfo(compiler, version)
+
+	logger.Info("== configure project ================")
+	configured, msg, err := configureCmake(ctx, source, env_info)
+	if err != nil {
+		logger.Error("Error occured. :" + err.Error())
+		return err
+	}
+	logger.Info(msg)
+
+	logger.Info("== build project ================")
+	built, msg2, err := buildBySource(ctx, configured, env_info)
+	if err != nil {
+		logger.Error("Error occured. :" + err.Error())
+		return err
+	}
+	logger.Info(msg2)
+
+	// run test
+	logger.Info("== run test =============")
+	_, msg3, err := runTest(ctx, built, env_info)
+	if err != nil {
+		logger.Error("Error occured. :" + err.Error())
+		return err
+	}
+	logger.Info(msg3)
 
 	return nil
 }
