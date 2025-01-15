@@ -1,12 +1,8 @@
-# local-test-for-cpp
+# cpp-test-ci
 
-C++ ローカルテスト実行環境
+C++ 複数環境に対するテスト実行
 
-## 環境
-
-Windows11
-
-## 依存ソフトのインストール/準備
+## 依存ソフトのインストール/準備(Windows11)
 
 -   GO言語(1.21以降)
 -   dagger
@@ -25,4 +21,16 @@ Windows11
 
 ```ps1
 dagger run go run main.go
+```
+
+## モジュール関連のメモ
+
+-   モジュール名変更
+```ps1
+go mod edit -module new-module-name
+```
+
+-   モジュール更新
+```ps1
+go mod tidy
 ```

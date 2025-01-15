@@ -8,9 +8,9 @@ import (
 
 	"dagger.io/dagger"
 
-	"local-test-for-cpp/buildenv"
-	"local-test-for-cpp/logging"
-	"local-test-for-cpp/setting"
+	"cpp-test-ci/buildenv"
+	"cpp-test-ci/logging"
+	"cpp-test-ci/setting"
 )
 
 func main() {

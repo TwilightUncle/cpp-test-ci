@@ -1,4 +1,4 @@
-module local-test-for-cpp
+module cpp-test-ci
 
 go 1.21.0
 
