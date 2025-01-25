@@ -17,10 +17,10 @@ func main() {
 	// read setting
 	if err := setting.Setup(); err != nil {
 		fmt.Println("Failed to read 'setting.json'")
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 	for _, err := range buildAll(context.Background()) {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
 

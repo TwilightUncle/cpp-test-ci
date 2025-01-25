@@ -1,0 +1,45 @@
+name: run-test
+
+on:
+  push:
+    branches:
+      - feat/test-ci
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      # 複数環境のテスト実施用ソース配置
+      - name: Clone cpp-test-ci
+        uses: actions/checkout@v4
+        with:
+          repository: TwilightUncle/cpp-test-ci
+          path: ./cpp-test-ci
+
+      # テストするコンパイラ等の設定ファイルを配置
+      - name: Copy setting file for test env
+        run: cp ./github.run-test.setting.json ./cpp-test-ci/setting.json
+
+      - name: Go Setup
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Run tests
+        uses: dagger/dagger-for-github@v6
+        with:
+          workdir: cpp-test-ci
+          verb: run
+          args: go run main.go
+          version: "0.8.3"
+
+      # コンパイルやテストに失敗したときのログを保存
+      - name: Test log save
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-log
+          path: ./cpp-test-ci/log 

@@ -1,0 +1,18 @@
+{
+    "projects": [
+        {
+            "name": "sample_proj1",
+            "target_dir_path": "/home/runner/work/<project-name>/<project-name>",
+            "compilers": [
+                {
+                    "name": "gcc",
+                    "version_list": ["10", "11"]
+                },
+                {
+                    "name": "clang",
+                    "version_list": ["12"]
+                }
+            ]
+        }
+    ]
+}
