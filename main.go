@@ -18,9 +18,16 @@ func main() {
 	if err := setting.Setup(); err != nil {
 		fmt.Println("Failed to read 'setting.json'")
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	for _, err := range buildAll(context.Background()) {
+
+	// run workflow
+	errors := buildAll(context.Background())
+	for _, err := range errors {
 		fmt.Fprintln(os.Stderr, err)
+	}
+	if len(errors) > 0 {
+		os.Exit(1)
 	}
 }
 
